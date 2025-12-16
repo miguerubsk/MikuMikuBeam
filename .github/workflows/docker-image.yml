@@ -7,6 +7,8 @@ on:
       - "dev" # Development branch (gets 'beta' tag)
     tags:
       - "v*" # Trigger on Git tags (e.g., v1.0.0) for releases
+    paths-ignore:
+      - '.github/**'
 
 jobs:
   # -----------------------------------------------------
