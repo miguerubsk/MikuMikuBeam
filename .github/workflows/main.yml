@@ -19,11 +19,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          # Importante: load=true compila la imagen en el demonio local
-          # pero NO la sube a DockerHub.
           load: true 
           tags: mmb-server:test
-          # Esto asegura que el caché se use para ir rápido, igual que en tu otro action
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
