@@ -30,3 +30,4 @@ dist-ssr
 
 #### Go ####
 bin/
+!internal/webassets/dist/.gitkeep

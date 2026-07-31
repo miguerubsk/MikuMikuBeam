@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -18,7 +17,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	socketio "github.com/zishang520/socket.io/socket"
-
+        webassets "github.com/sammwyy/mikumikubeam/internal/webassets"
 	mc "github.com/sammwyy/mikumikubeam/internal/attacks/game"
 	httpA "github.com/sammwyy/mikumikubeam/internal/attacks/http"
 	tcpA "github.com/sammwyy/mikumikubeam/internal/attacks/tcp"
@@ -217,27 +216,16 @@ func main() {
 	})
 
 	// Determine static directory
-	staticDirs := []string{
-		filepath.Join("bin", "web-client"),
-		filepath.Join("web-client", "dist"),
-	}
-	var staticDir string
-	for _, dir := range staticDirs {
-		if fi, err := os.Stat(dir); err == nil && fi.IsDir() {
-			staticDir = dir
-			break
+	if webassets.HasAssets() {
+		assetsFS, err := webassets.FS()
+		if err != nil {
+			log.Warn().Err(err).Msg("No se pudieron cargar los assets embebidos. Panel no disponible.")
+		} else {
+			e.StaticFS("/", assetsFS)
+			log.Info().Msg("Serving embedded static files")
 		}
-	}
-
-	if staticDir != "" {
-		e.Static("/", staticDir)
-		indexPath := filepath.Join(staticDir, "index.html")
-		if _, err := os.Stat(indexPath); err == nil {
-			e.File("/", indexPath)
-		}
-		log.Info().Msgf("Serving static files from %s", staticDir)
 	} else {
-		log.Warn().Msg("Static web assets not found (bin/web-client or web-client/dist). Panel will be unavailable.")
+		log.Warn().Msg("Static web assets not embedded. Panel will be unavailable.")
 	}
 
 	log.Info().Msgf("Server listening on :%d", cfg.ServerPort)
